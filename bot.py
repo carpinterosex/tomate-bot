@@ -1,12 +1,16 @@
+import os
 import discord
 from discord.ext import commands
-import os
 
 TOKEN = os.getenv("TOKEN")
 
-USUARIO_OBJETIVO = 123456789012345678
-USUARIO_OBJETIVO = 316310136144658444
-USUARIO_OBJETIVO = 887786888839180288
+USUARIOS_OBJETIVO = [
+    887786888839180288,  # Usuario 1
+    316310136144658444,  # Usuario 2
+    1164933082428743701,  # Usuario 3
+    974297735559806986   # Usuario 4
+]
+
 REACCIONES = ["🍅"]
 
 intents = discord.Intents.default()
@@ -20,15 +24,12 @@ async def on_ready():
 
 @bot.event
 async def on_message(message):
-    if message.author.id == bot.user.id:
-        return
-
-    if message.author.id == 974297735559806986:
+    if message.author.id in USUARIOS_OBJETIVO:
         for reaccion in REACCIONES:
             try:
                 await message.add_reaction(reaccion)
-            except Exception:
-                pass
+            except Exception as e:
+                print(f"Error al reaccionar: {e}")
 
     await bot.process_commands(message)
 
