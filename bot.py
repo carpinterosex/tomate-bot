@@ -5,6 +5,9 @@ from google import genai
 TOKEN = os.getenv("TOKEN")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
+print("TOKEN existe:", TOKEN is not None)
+print("GEMINI existe:", GEMINI_API_KEY is not None)
+
 client = genai.Client(api_key=GEMINI_API_KEY)
 USUARIOS_OBJETIVO = [
     887786888839180288,  # Usuario 1
