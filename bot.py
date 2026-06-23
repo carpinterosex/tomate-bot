@@ -34,3 +34,17 @@ async def on_message(message):
     await bot.process_commands(message)
 
 bot.run(TOKEN)
+
+@bot.event
+async def on_message(message):
+
+if message.author.id in USUARIOS_OBJETIVO:
+    try:
+        await message.add_reaction("🍅")
+    except:
+        pass
+
+if bot.user in message.mentions:
+    await message.reply("🍅 IA conectada correctamente")
+
+await bot.process_commands(message)
