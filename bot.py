@@ -87,5 +87,3 @@ Usuario: {pregunta}
     await bot.process_commands(message)
 
 bot.run(TOKEN)
-
-```
