@@ -3,6 +3,7 @@ import time
 import discord
 from discord.ext import commands
 from google import genai
+from datetime import datetime
 
 TOKEN = os.getenv("TOKEN")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
@@ -51,8 +52,12 @@ async def on_message(message):
 
                 for intento in range(intentos):
                     try:
+                        # Obtiene la fecha y hora actual en español
+                        fecha_actual = datetime.now().strftime("%A, %d de %B de %Y - %H:%M")
+                        
                         prompt = f"""
 Eres un bot de Discord.
+La fecha y hora actual real es: {fecha_actual}
 
 Reglas:
 - Responde siempre en español.
