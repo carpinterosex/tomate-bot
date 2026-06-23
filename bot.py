@@ -33,8 +33,6 @@ async def on_message(message):
 
     await bot.process_commands(message)
 
-bot.run(TOKEN)
-
 @bot.event
 async def on_message(message):
 
@@ -48,3 +46,5 @@ if bot.user in message.mentions:
     await message.reply("🍅 IA conectada correctamente")
 
 await bot.process_commands(message)
+
+bot.run(TOKEN)
