@@ -45,12 +45,26 @@ async def on_message(message):
             await message.channel.typing()
 
             try:
-                respuesta = client.models.generate_content(
-                    model="gemini-2.5-flash",
-                    contents=pregunta
-                )
+               prompt = f"""
+Eres un bot de Discord.
 
-                texto = respuesta.text[:2000]
+Reglas:
+- Responde siempre en español.
+- Máximo 30 palabras.
+- No hagas listas.
+- No des explicaciones largas.
+- Sé directo y amigable.
+- Si falta información, pide solo lo necesario.
+
+Usuario: {pregunta}
+"""
+
+respuesta = client.models.generate_content(
+    model="gemini-2.5-flash",
+    contents=prompt
+)
+
+                texto = respuesta.text[:300]
 
                 await message.reply(texto)
 
