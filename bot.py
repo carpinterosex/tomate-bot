@@ -44,8 +44,7 @@ async def on_message(message):
 
             await message.channel.typing()
 
-            try:
-               prompt = f"""
+            try:prompt = f"""
 Eres un bot de Discord.
 
 Reglas:
@@ -73,5 +72,6 @@ respuesta = client.models.generate_content(
 
     await bot.process_commands(message)
 
+               
 
 bot.run(TOKEN)
