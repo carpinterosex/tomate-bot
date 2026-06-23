@@ -1,4 +1,6 @@
+```python
 import os
+import time
 import discord
 from discord.ext import commands
 from google import genai
@@ -12,10 +14,10 @@ print("GEMINI existe:", GEMINI_API_KEY is not None)
 client = genai.Client(api_key=GEMINI_API_KEY)
 
 USUARIOS_OBJETIVO = [
-    887786888839180288,  # Usuario 1
-    316310136144658444,  # Usuario 2
-    1164933082428743701,  # Usuario 3
-    974297735559806986   # Usuario 4
+    887786888839180288,
+    316310136144658444,
+    1164933082428743701,
+    974297735559806986
 ]
 
 REACCIONES = ["🍅"]
@@ -30,7 +32,6 @@ async def on_message(message):
     if message.author == bot.user:
         return
 
-    # Reaccionar a usuarios específicos
     if message.author.id in USUARIOS_OBJETIVO:
         for reaccion in REACCIONES:
             try:
@@ -38,16 +39,20 @@ async def on_message(message):
             except Exception:
                 pass
 
-    # Responder a menciones con Gemini
     if bot.user in message.mentions:
         pregunta = message.content.replace(f"<@{bot.user.id}>", "")
         pregunta = pregunta.replace(f"<@!{bot.user.id}>", "").strip()
 
         if pregunta:
-            # 'async with' asegura que el bot deje de "escribir" si algo falla dentro
             async with message.channel.typing():
-                try:
-                    prompt = f"""
+                intentos = 3
+                exito = False
+                texto_respuesta = ""
+                ultimo_error = ""
+
+                for intento in range(intentos):
+                    try:
+                        prompt = f"""
 Eres un bot de Discord.
 
 Reglas:
@@ -60,18 +65,28 @@ Reglas:
 
 Usuario: {pregunta}
 """
-                    # Toda esta sección ahora está correctamente indentada dentro del try
-                    respuesta = client.models.generate_content(
-                        model="gemini-2.5-flash",
-                        contents=prompt
-                    )
+                        respuesta = client.models.generate_content(
+                            model="gemini-2.5-flash",
+                            contents=prompt
+                        )
+                        texto_respuesta = respuesta.text[:300]
+                        exito = True
+                        break
+                        
+                    except Exception as e:
+                        ultimo_error = str(e)
+                        if "503" in ultimo_error or "UNAVAILABLE" in ultimo_error:
+                            time.sleep(3)
+                        else:
+                            break
 
-                    texto = respuesta.text[:300]
-                    await message.reply(texto)
-
-                except Exception as e:
-                    await message.reply(f"Error al procesar con Gemini: {e}")
+                if exito:
+                    await message.reply(texto_respuesta)
+                else:
+                    await message.reply(f"Error tras varios intentos: {ultimo_error}")
 
     await bot.process_commands(message)
 
 bot.run(TOKEN)
+
+```
