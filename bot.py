@@ -45,6 +45,19 @@ async def on_message(message):
 
         if pregunta:
             async with message.channel.typing():
+                
+                # --- NUEVA LÓGICA: OBTENER EL HISTORIAL RECIENTE ---
+                historial_texto = ""
+                try:
+                    # Lee los últimos 200 mensajes del canal donde se hizo la pregunta
+                    async for msg in message.channel.history(limit=300, before=message):
+                        # Evitamos meter comandos u otras menciones al bot para no confundir a Gemini
+                        if msg.content and not msg.content.startswith("!"):
+                            historial_texto += f"{msg.author.display_name}: {msg.content}\n"
+                except Exception as e:
+                    print(f"No se pudo leer el historial: {e}")
+                # --------------------------------------------------
+
                 intentos = 3
                 exito = False
                 texto_respuesta = ""
@@ -52,20 +65,21 @@ async def on_message(message):
 
                 for intento in range(intentos):
                     try:
-                        # Obtiene la fecha y hora actual en español
                         fecha_actual = datetime.now().strftime("%A, %d de %B de %Y - %H:%M")
                         
                         prompt = f"""
-Eres un bot de Discord.
+Eres un bot de Discord con acceso al historial de mensajes recientes del canal.
 La fecha y hora actual real es: {fecha_actual}
 
+Historial reciente del canal (para tu contexto):
+{historial_texto if historial_texto else "No hay mensajes previos disponibles."}
+
 Reglas:
+- Responde a la pregunta del usuario basándote en el historial provisto arriba si es relevante.
 - Responde siempre en español.
-- Máximo 30 palabras.
+- Máximo 40 palabras (se extendió un poco para que puedas dar mejores resúmenes).
 - No hagas listas.
-- No des explicaciones largas.
 - Sé directo y amigable.
-- Si falta información, pide solo lo necesario.
 
 Usuario: {pregunta}
 """
@@ -73,7 +87,7 @@ Usuario: {pregunta}
                             model="gemini-2.5-flash",
                             contents=prompt
                         )
-                        texto_respuesta = respuesta.text[:300]
+                        texto_respuesta = respuesta.text[:400]
                         exito = True
                         break
                         
